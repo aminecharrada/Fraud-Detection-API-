@@ -1,32 +1,39 @@
 FROM python:3.11-slim
 WORKDIR /app
 
-# System deps (optional but useful for pandas/scikit-learn wheels)
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Installation des dépendances Python
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt requests gunicorn
 
-# Install requests for downloading models
-RUN pip install --no-cache-dir requests
+# Copie des fichiers d'application
+COPY . .
 
-# Copy application files
-COPY app.py gunicorn.conf.py download_models.py ./
-COPY .env.example ./.env
+# Configuration de l'environnement
+ENV PORT=10000 \
+    MODEL_DIR=/app/model \
+    PYTHONUNBUFFERED=1 \
+    MODEL_DOWNLOAD_URL=""
 
-# Download and extract model files during build
-RUN python download_models.py
+# Création du dossier model
+RUN mkdir -p ${MODEL_DIR}
 
-# Configure environment
-ENV PORT=10000
-ENV MODEL_DIR=/app/model
-ENV PYTHONUNBUFFERED=1
+# Script de démarrage
+COPY <<EOF /app/start.sh
+#!/bin/sh
+# Téléchargement des modèles au démarrage
+python download_models.py
+# Démarrage de l'application
+exec gunicorn -c gunicorn.conf.py app:app
+EOF
+
+RUN chmod +x /app/start.sh
 
 EXPOSE ${PORT}
 
-# Use gunicorn for production serving
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
+# Utilisation du script de démarrage
+CMD ["/app/start.sh"]
