@@ -1,0 +1,21 @@
+{
+  "Transaction_Amount": 2100.0,
+  "Transaction_Type": "Debit",
+  "Account_Balance": 9000.0,
+  "Device_Type": "Web",
+  "Location": "Tokyo",
+  "Merchant_Category": "Electronics",
+  "IP_Address_Flag": 0,
+  "Previous_Fraudulent_Activity": 0,
+  "Daily_Transaction_Count": 1,
+  "Avg_Transaction_Amount_7d": 1800.0,
+  "Failed_Transaction_Count_7d": 0,
+  "Card_Type": "MasterCard",
+  "Card_Age": 60,
+  "Transaction_Distance": 9800,
+  "Authentication_Method": "OTP",
+  "Is_Weekend": 1,
+  "Hour": 11,
+  "Month": 8,
+  "Year": 2025
+}
