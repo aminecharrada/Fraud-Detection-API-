@@ -1,20 +1,16 @@
-{
-  "name": "fraud-detection-api",
-  "env": "docker",
-  "dockerfilePath": "./Dockerfile",
-  "envVars": [
-    {
-      "key": "PORT",
-      "value": "10000"
-    },
-    {
-      "key": "MODEL_DIR",
-      "value": "/app/model"
-    },
-    {
-      "key": "PYTHONUNBUFFERED",
-      "value": "1"
-    }
-  ],
-  "healthCheckPath": "/health"
-}
+services:
+  - type: web
+    name: fraud-detection-api
+    runtime: docker
+    repo: https://github.com/aminecharrada/Fraud-Detection-API-
+    plan: free
+    branch: main
+    dockerCommand: gunicorn -c gunicorn.conf.py app:app
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MODEL_DIR
+        value: /app/model
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /health
