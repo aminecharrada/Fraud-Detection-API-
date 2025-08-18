@@ -1,0 +1,20 @@
+{
+  "name": "fraud-detection-api",
+  "env": "docker",
+  "dockerfilePath": "./Dockerfile",
+  "envVars": [
+    {
+      "key": "PORT",
+      "value": "10000"
+    },
+    {
+      "key": "MODEL_DIR",
+      "value": "/app/model"
+    },
+    {
+      "key": "PYTHONUNBUFFERED",
+      "value": "1"
+    }
+  ],
+  "healthCheckPath": "/health"
+}

@@ -4,18 +4,29 @@ WORKDIR /app
 # System deps (optional but useful for pandas/scikit-learn wheels)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
-COPY model ./model
+# Install requests for downloading models
+RUN pip install --no-cache-dir requests
+
+# Copy application files
+COPY app.py gunicorn.conf.py download_models.py ./
 COPY .env.example ./.env
-COPY gunicorn.conf.py ./
 
-ENV PORT=5000
-EXPOSE 5000
+# Download and extract model files during build
+RUN python download_models.py
 
-# Use gunicorn for prod serving
+# Configure environment
+ENV PORT=10000
+ENV MODEL_DIR=/app/model
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE ${PORT}
+
+# Use gunicorn for production serving
 CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
