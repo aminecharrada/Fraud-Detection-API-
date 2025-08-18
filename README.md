@@ -4,30 +4,61 @@ Cette API permet de détecter les fraudes dans les transactions bancaires en uti
 
 ## Fichiers de modèle
 
-En raison des limitations de taille de GitHub, les fichiers de modèle (.pkl) ne sont pas inclus dans ce dépôt. Vous devez les télécharger séparément et les placer dans le dossier approprié :
+En raison des limitations de taille de GitHub, les fichiers de modèle (.pkl) sont hébergés sur Google Drive. Suivez ces étapes pour les installer :
 
-### Fichiers requis :
+1. [Téléchargez les fichiers de modèle](https://drive.google.com/file/d/1Yr9hl3-ELOumaueUBxGgngNjmOalBR0N/view?usp=sharing)
+2. Extrayez le fichier `model_files.zip` dans le dossier du projet
+3. Vérifiez que les fichiers suivants sont présents dans le dossier `model/` :
+   - encoder.pkl
+   - feature_order.pkl
+   - fraud_model_calibrated.pkl
+   - scaler.pkl
 
-Dans le dossier racine :
-- fraud_rf_model.pkl
-- fraud_model_calibrated.pkl
-
-Dans le dossier `model/` :
-- encoder.pkl
-- feature_order.pkl
-- fraud_model_calibrated.pkl
-- scaler.pkl
+La structure du dossier `model/` devrait ressembler à ceci :
+```
+model/
+├── encoder.pkl
+├── feature_order.pkl
+├── fraud_model_calibrated.pkl
+└── scaler.pkl
+```
 
 ## Installation
 
-1. Cloner le dépôt
-2. Créer un environnement virtuel : `python -m venv .venv`
-3. Activer l'environnement virtuel :
-   - Windows : `.venv\Scripts\activate`
-   - Linux/Mac : `source .venv/bin/activate`
-4. Installer les dépendances : `pip install -r requirements.txt`
-5. Télécharger et placer les fichiers de modèle aux emplacements appropriés
-6. Lancer l'application : `python app.py`
+1. Cloner le dépôt :
+   ```bash
+   git clone https://github.com/aminecharrada/Fraud-Detection-API-.git
+   cd Fraud-Detection-API-
+   ```
+
+2. Télécharger et extraire les fichiers de modèle :
+   - Téléchargez [model_files.zip](https://drive.google.com/file/d/1Yr9hl3-ELOumaueUBxGgngNjmOalBR0N/view?usp=sharing)
+   - Extrayez le contenu dans le dossier du projet
+   - Vérifiez que le dossier `model/` contient tous les fichiers .pkl requis
+
+3. Créer et activer l'environnement virtuel :
+   ```bash
+   # Création de l'environnement virtuel
+   python -m venv .venv
+
+   # Activation de l'environnement virtuel
+   # Sur Windows :
+   .venv\Scripts\activate
+   # Sur Linux/Mac :
+   source .venv/bin/activate
+   ```
+
+4. Installer les dépendances :
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Lancer l'application :
+   ```bash
+   python app.py
+   ```
+
+L'API sera accessible à l'adresse : http://localhost:5000
 
 ## Utilisation de l'API
 

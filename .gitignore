@@ -1,4 +1,6 @@
 *.pkl
+model/*.pkl
 __pycache__/
 .env
 .venv/
+*.zip
