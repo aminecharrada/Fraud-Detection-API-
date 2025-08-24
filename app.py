@@ -3,6 +3,7 @@ import json
 import joblib
 import pandas as pd
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -59,6 +60,10 @@ if threshold_env is not None:
 # ------------------------------
 app = Flask(__name__)
 
+# Enable CORS for all routes to allow Flutter Web requests
+CORS(app, origins=["*"], methods=["GET", "POST", "OPTIONS"],
+     allow_headers=["Content-Type", "Accept", "User-Agent"])
+
 
 
 # ------------------------------
@@ -98,11 +103,42 @@ def preprocess_frame(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df_proc
 
 # ------------------------------
+# Utility routes
+# ------------------------------
+
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "message": "Fraud Detection API is running!",
+        "endpoints": {
+            "/predict": "POST - Make fraud prediction",
+            "/health": "GET - Check API health"
+        },
+        "model_loaded": model is not None
+    })
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "threshold": threshold_used
+    })
+
+# ------------------------------
 # Prediction routes
 # ------------------------------
 
-@app.post("/predict")
+@app.route("/predict", methods=["POST", "OPTIONS"])
 def predict_single():
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Accept,User-Agent")
+        response.headers.add("Access-Control-Allow-Methods", "POST,OPTIONS")
+        return response
+
     try:
         payload = request.get_json(force=True)
         if not isinstance(payload, dict):
@@ -118,36 +154,45 @@ def predict_single():
 
         p = float(proba[0])
         pred = int(p >= threshold_used)
-        return jsonify({
+
+        response = jsonify({
             "prediction": pred,
             "fraud_probability": round(p, 4),
             "threshold_used": threshold_used
         })
+
+        # Add CORS headers manually
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Accept,User-Agent")
+        return response
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        error_response = jsonify({"error": str(e)})
+        error_response.headers.add("Access-Control-Allow-Origin", "*")
+        return error_response, 400
 
-@app.post("/predict-batch")
-def predict_batch():
-    try:
-        payload = request.get_json(force=True)
-        if not isinstance(payload, list):
-            return jsonify({"error": "Send a JSON array for /predict-batch."}), 400
-        df = pd.DataFrame(payload)
+# @app.post("/predict-batch")
+# def predict_batch():
+#     try:
+#         payload = request.get_json(force=True)
+#         if not isinstance(payload, list):
+#             return jsonify({"error": "Send a JSON array for /predict-batch."}), 400
+#         df = pd.DataFrame(payload)
 
-        if MODEL_BUNDLE:
-            proba = model.predict_proba(df)[:, 1]
-        else:
-            df_proc = preprocess_frame(df)
-            proba = model.predict_proba(df_proc)[:, 1]
+#         if MODEL_BUNDLE:
+#             proba = model.predict_proba(df)[:, 1]
+#         else:
+#             df_proc = preprocess_frame(df)
+#             proba = model.predict_proba(df_proc)[:, 1]
 
-        preds = (proba >= threshold_used).astype(int)
-        results = [
-            {"index": int(i), "prediction": int(preds[i]), "fraud_probability": float(round(proba[i], 4))}
-            for i in range(len(preds))
-        ]
-        return jsonify({"threshold_used": threshold_used, "results": results})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+#         preds = (proba >= threshold_used).astype(int)
+#         results = [
+#             {"index": int(i), "prediction": int(preds[i]), "fraud_probability": float(round(proba[i], 4))}
+#             for i in range(len(preds))
+#         ]
+#         return jsonify({"threshold_used": threshold_used, "results": results})
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     # For dev only. Use gunicorn in production.
