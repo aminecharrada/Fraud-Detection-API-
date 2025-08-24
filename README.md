@@ -64,26 +64,8 @@ L'API sera accessible à l'adresse : http://localhost:5000
 
 L'API expose les endpoints suivants :
 
-- GET `/health` - Vérifier l'état de l'API
-- GET `/schema` - Voir le schéma des données attendues
+
 - POST `/predict` - Prédire la fraude sur une seule transaction
 - POST `/predict-batch` - Prédire la fraude sur plusieurs transactions
 
-Voir le dossier `tests/` pour des exemples de requêtes.
 
-## Déploiement sur Render
-
-1. Créez un compte sur [Render](https://render.com) si ce n'est pas déjà fait
-2. Dans le tableau de bord Render, cliquez sur "New +"
-3. Sélectionnez "Web Service"
-4. Connectez votre dépôt GitHub
-5. Configurez le service :
-   - **Nom** : fraud-detection-api (ou votre choix)
-   - **Environnement** : Docker
-   - **Branch** : main
-   - **Port** : 10000
-   - **Variables d'environnement** :
-     - `MODEL_DIR` : /app/model
-     - `PYTHONUNBUFFERED` : 1
-
-Le déploiement se fera automatiquement. L'API sera accessible à l'URL fournie par Render.
