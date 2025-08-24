@@ -6,7 +6,14 @@ from pathlib import Path
 def download_models():
     """Télécharge et extrait les fichiers de modèle."""
     # URL de téléchargement direct
-    url = os.getenv('MODEL_DOWNLOAD_URL', 'https://github.com/aminecharrada/Fraud-Detection-API-/releases/download/v1.0/model_files.zip')
+    url = os.getenv(
+    'MODEL_DOWNLOAD_URL',
+    'https://github.com/aminecharrada/Fraud-Detection-API-/releases/download/v1.0/model_files.zip'
+    )
+
+    if not url:
+        print("URL de téléchargement non définie. Utilisation des modèles locaux si disponibles...")
+        return
     
     # Créer le dossier model s'il n'existe pas
     model_dir = Path(os.getenv('MODEL_DIR', 'model'))
